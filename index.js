@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-// require("dotenv").config(); 
+
 
 // Routes
 const userRoutes = require("./src/routes/user.routes");
@@ -12,16 +12,14 @@ const videoRoutes = require("./src/routes/video.routes");
 const app = express();
 
 // Middleware
-app.use(cors()); 
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: true })); 
-
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // API Routes
-app.use("/api/users", userRoutes); 
-app.use("/api/courses", courseRoutes); 
-app.use("/api/videos", videoRoutes); 
-
+app.use("/api/users", userRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/videos", videoRoutes);
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri =
@@ -51,12 +49,9 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
