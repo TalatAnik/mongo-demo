@@ -5,9 +5,9 @@ const cors = require("cors");
 // require("dotenv").config(); 
 
 // Routes
-const userRoutes = require("./routes/userRoutes");
-const courseRoutes = require("./routes/courseRoutes");
-const videoRoutes = require("./routes/videoRoutes");
+const userRoutes = require("./src/routes/user.routes");
+const courseRoutes = require("./src/routes/course.routes");
+const videoRoutes = require("./src/routes/video.routes");
 
 const app = express();
 
@@ -16,22 +16,41 @@ app.use(cors());
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
 
-// MongoDB Connection
-const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://localhost:27017/video-platform-demo";
-
-mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
 
 // API Routes
 app.use("/api/users", userRoutes); 
 app.use("/api/courses", courseRoutes); 
 app.use("/api/videos", videoRoutes); 
+
+
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const uri =
+  "mongodb+srv://pranxta007:hd5AD3uOMLDJixxb@cluster0.kjrip.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
+
 
 
 app.use((req, res) => {
