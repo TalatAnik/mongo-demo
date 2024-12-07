@@ -1,6 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { createCourse, deleteCourse, getAllCourses } = require("../controllers/course.controller");
+const {
+  createCourse,
+  deleteCourse,
+  getAllCourses,
+  getCoursesByInstructor,
+} = require("../controllers/course.controller");
 
 
 router.post(
@@ -12,6 +17,7 @@ router.post(
 );
 
 router.get("/", getAllCourses);
+router.get("/instructor/:instructorId", getCoursesByInstructor);
 
 router.delete("/:courseId", deleteCourse);
 

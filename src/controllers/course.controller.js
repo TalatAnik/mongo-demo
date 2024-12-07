@@ -108,8 +108,40 @@ const getAllCourses = async (req, res, next) => {
   }
 };
 
+
+const getCoursesByInstructor = async (req, res) => {
+  const { instructorId } = req.params;
+
+  try {
+    
+    const courses = await Course.find({ instructorId })
+      .select("title description chapters createdAt") 
+      .lean(); 
+
+    if (!courses.length) {
+      return res.status(404).json({ message: "No courses found for this instructor" });
+    }
+
+    
+    const enrichedCourses = courses.map(course => ({
+      id: course._id,
+      title: course.title,
+      description: course.description,
+      chapters: course.chapters.length, 
+      videos: course.chapters.reduce((total, chapter) => total + chapter.videos.length, 0), 
+      createdAt: course.createdAt,
+    }));
+
+    res.status(200).json(enrichedCourses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createCourse,
   deleteCourse,
-  getAllCourses
+  getAllCourses,
+  getCoursesByInstructor
 };
