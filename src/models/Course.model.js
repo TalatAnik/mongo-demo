@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
+const video = require("../models/Video.model")
 
 const ChapterSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  videos: [videoSchema], // Array of videos
+  videos: ["Video"], // Array of videos
 });
 
 const CourseSchema = new mongoose.Schema({
