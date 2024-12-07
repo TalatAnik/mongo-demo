@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// Example: Fetch all videos
+
 router.get("/", (req, res) => {
   res.json({ message: "Video routes working!" });
 });
@@ -9,12 +9,18 @@ router.get("/", (req, res) => {
 const {
   upload,
   addVideoToChapter,
+  uploadVideoFile,
+  addVideoMetadata
 } = require("../controllers/video.controller");
 
+
+
 router.post(
-  "/:courseId/chapters/:chapterId/videos",
-  upload.single("video"),
-  addVideoToChapter
+  "/upload/:courseId/:chapterId",
+  upload.single("video"), // Handle file upload
+  uploadVideoFile
 );
+
+router.post("/:courseId/:chapterId/metadata", addVideoMetadata);
 
 module.exports = router;

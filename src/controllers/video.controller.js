@@ -31,42 +31,57 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 
 
-const addVideoToChapter = async (req, res) => {
-  const { courseId, chapterId } = req.params;
-  const { title, description } = req.body;
-  const videoFile = req.file;
+const uploadVideoFile = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No video file uploaded" });
+  }
 
   try {
-    // Find the course by ID
-    const course = await Course.findById(courseId);
+    // Return file information for confirmation
+    res.status(201).json({
+      message: "Video uploaded successfully",
+      fileName: req.file.filename,
+      filePath: `uploads/videos/${req.file.filename}`, // Path for debugging
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error during file upload" });
+  }
+};
 
+const addVideoMetadata = async (req, res) => {
+  const { courseId, chapterId } = req.params;
+  const { title, description, videoId } = req.body;
+
+  try {
+    // Find the course
+    const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Find the chapter by ID
+    // Find the chapter
     const chapter = course.chapters.id(chapterId);
-
     if (!chapter) {
       return res.status(404).json({ message: "Chapter not found" });
     }
 
-    // Create video metadata to be saved in the database
-    const newVideo = {
-      title,
-      description,
-      fileName: videoFile.filename, // Store the video file name for later access
-    };
+    // Find the video by videoId
+    const video = chapter.videos.id(videoId);
+    if (!video) {
+      return res.status(404).json({ message: "Video not found" });
+    }
 
-    // Push the video to the chapter's videos array
-    chapter.videos.push(newVideo);
+    // Update video metadata
+    video.title = title;
+    video.description = description;
 
-    // Save the updated course document
+    // Save the updated course
     await course.save();
 
-    res.status(201).json({
-      message: "Video added successfully",
-      video: newVideo,
+    res.status(200).json({
+      message: "Video metadata added successfully",
+      video,
     });
   } catch (err) {
     console.error(err);
@@ -76,5 +91,6 @@ const addVideoToChapter = async (req, res) => {
 
 module.exports = {
   upload,
-  addVideoToChapter,
+  addVideoMetadata,
+  uploadVideoFile
 };
