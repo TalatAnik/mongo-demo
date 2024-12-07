@@ -78,7 +78,38 @@ const deleteCourse = async (req, res) => {
   }
 };
 
+const getAllCourses = async (req, res, next) => {
+  try {
+    const courses = await Course.find()
+      .populate("instructorId", "name") // Populate instructor name
+      .exec();
+
+    const courseList = courses.map((course) => {
+      // Calculate total number of videos
+      const totalVideos = course.chapters.reduce((sum, chapter) => {
+        return sum + chapter.videos.length;
+      }, 0);
+
+      return {
+        id: course._id,
+        title: course.title,
+        description: course.description,
+        instructorName: course.instructorId.name,
+        numberOfVideos: totalVideos,
+      };
+    });
+
+    
+
+    res.status(200).json(courseList);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch courses" });
+  }
+};
+
 module.exports = {
   createCourse,
-  deleteCourse
+  deleteCourse,
+  getAllCourses
 };
