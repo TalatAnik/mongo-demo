@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const ChapterSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
+  videos: [videoSchema], // Array of videos
 });
 
 const CourseSchema = new mongoose.Schema({
