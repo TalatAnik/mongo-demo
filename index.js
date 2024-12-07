@@ -12,6 +12,9 @@ const chapterRoutes = require("./src/routes/chapter.route");
 
 const app = express();
 
+// Serve static files (videos) from 'uploads' folder
+app.use('/uploads', express.static('uploads'));
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -21,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/videos", videoRoutes);
-app.use('/api/chapters', chapterRoutes); // Register chapter routes
+app.use("/api/chapters", chapterRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
