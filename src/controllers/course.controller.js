@@ -39,14 +39,14 @@ const deleteCourse = async (req, res) => {
   const { courseId } = req.params;
 
   try {
-    // Find the course by ID
+    
     const course = await Course.findById(courseId);
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Collect all video file names from the course's chapters
+    
     const videoFiles = [];
     course.chapters.forEach((chapter) => {
       chapter.videos.forEach((video) => {
@@ -54,7 +54,7 @@ const deleteCourse = async (req, res) => {
       });
     });
 
-    // Delete the video files from the file system
+    
     videoFiles.forEach((fileName) => {
       const filePath = path.join(__dirname, "../../uploads/videos", fileName);
       fs.unlink(filePath, (err) => {
@@ -66,7 +66,7 @@ const deleteCourse = async (req, res) => {
       });
     });
 
-    // Remove the course from the database
+    
     await Course.findByIdAndDelete(courseId);
 
     res
@@ -81,7 +81,7 @@ const deleteCourse = async (req, res) => {
 const getAllCourses = async (req, res, next) => {
   try {
     const courses = await Course.find()
-      .populate("instructorId", "name") // Populate instructor name
+      .populate("instructorId", "name") 
       .exec();
 
     const courseList = courses.map((course) => {
@@ -139,9 +139,50 @@ const getCoursesByInstructor = async (req, res) => {
   }
 };
 
+const getCourseDetails = async (req, res) => {
+  const { courseId } = req.params;
+
+  try {
+    
+    const course = await Course.findById(courseId)
+      .populate("instructorId", "name") 
+      .lean(); 
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    
+    const courseDetails = {
+      id: course._id,
+      title: course.title,
+      description: course.description,
+      instructor: course.instructorId.name, 
+      createdAt: course.createdAt,
+      updatedAt: course.updatedAt,
+      chapters: course.chapters.map((chapter) => ({
+        id: chapter._id,
+        title: chapter.title,
+        description: chapter.description,
+        videos: chapter.videos.map((video) => ({
+          id: video._id,
+          title: video.title,
+          description: video.description,
+          fileName: video.fileName, 
+        })),
+      })),
+    };
+
+    res.status(200).json(courseDetails);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createCourse,
   deleteCourse,
   getAllCourses,
-  getCoursesByInstructor
+  getCoursesByInstructor,
+  getCourseDetails
 };

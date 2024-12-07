@@ -5,6 +5,7 @@ const {
   deleteCourse,
   getAllCourses,
   getCoursesByInstructor,
+  getCourseDetails
 } = require("../controllers/course.controller");
 
 
@@ -18,6 +19,7 @@ router.post(
 
 router.get("/", getAllCourses);
 router.get("/instructor/:instructorId", getCoursesByInstructor);
+router.get("/:courseId", getCourseDetails);
 
 router.delete("/:courseId", deleteCourse);
 
