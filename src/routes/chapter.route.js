@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { createCourse } = require("../controllers/course.controller");
+const { addChapterToCourse } = require("../controllers/chapter.controller");
 
-
+// Route to add a chapter to a course
 router.post(
-  "/", 
-  createCourse, 
+  "/:courseId",
+  addChapterToCourse,
   async (req, res) => {
     res.json(req.result);
   }

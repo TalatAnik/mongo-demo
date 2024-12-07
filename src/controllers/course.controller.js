@@ -28,7 +28,7 @@ const createCourse = async (req, res, next) => {
     return res.status(500).json({ error: "Failed to create course" });
   }
 
-  next()
+  next();
 };
 
 module.exports = {
