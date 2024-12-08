@@ -9,6 +9,7 @@ const userRoutes = require("./src/routes/user.routes");
 const courseRoutes = require("./src/routes/course.routes");
 const videoRoutes = require("./src/routes/video.routes");
 const chapterRoutes = require("./src/routes/chapter.route");
+const authRoutes = require("./src/routes/auth.route");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/chapters", chapterRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
