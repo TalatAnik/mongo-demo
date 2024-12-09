@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
+const path = require("path");
 
 // Routes
 const userRoutes = require("./src/routes/user.routes");
@@ -13,8 +13,7 @@ const authRoutes = require("./src/routes/auth.route");
 
 const app = express();
 
-// Serve static files (videos) from 'uploads' folder
-app.use('/uploads', express.static('uploads'));
+
 
 // Middleware
 app.use(cors());
@@ -28,9 +27,19 @@ app.use("/api/videos", videoRoutes);
 app.use("/api/chapters", chapterRoutes);
 app.use("/api/auth", authRoutes);
 
+
+// Serve static files (videos) from 'uploads' folder
+app.use(
+  "/uploads/videos",
+  express.static(path.join(__dirname, "uploads/videos"))
+);
+
+
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
+
+
 
 mongoose.connect(
   "mongodb+srv://pranxta007:hd5AD3uOMLDJixxb@cluster0.kjrip.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"

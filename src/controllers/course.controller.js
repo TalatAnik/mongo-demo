@@ -19,13 +19,13 @@ const createCourse = async (req, res, next) => {
       instructorId,
     });
 
-    await newCourse.save();
+    const resCourse = await newCourse.save();
 
     req.result = {
       status: 201,
       message: "Course created successfully",
-      course: newCourse,
-    }
+      course: resCourse,
+    };
   } catch (error) {
     console.error("Error creating course:", error);
     return res.status(500).json({ error: "Failed to create course" });
@@ -55,16 +55,7 @@ const deleteCourse = async (req, res) => {
     });
 
     
-    videoFiles.forEach((fileName) => {
-      const filePath = path.join(__dirname, "../../uploads/videos", fileName);
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.error(`Failed to delete file ${fileName}:`, err);
-        } else {
-          console.log(`Deleted file: ${fileName}`);
-        }
-      });
-    });
+    
 
     
     await Course.findByIdAndDelete(courseId);
@@ -95,6 +86,7 @@ const getAllCourses = async (req, res, next) => {
         title: course.title,
         description: course.description,
         instructorName: course.instructorId.name,
+        instructorId: course.instructorId.id,
         numberOfVideos: totalVideos,
       };
     });
@@ -143,20 +135,25 @@ const getCourseDetails = async (req, res) => {
   const { courseId } = req.params;
 
   try {
-    
     const course = await Course.findById(courseId)
-      .populate("instructorId", "name") 
-      .lean(); 
+      .populate("instructorId", "name") // Populate instructor details
+      .populate({
+        path: "chapters.videos", // Populate videos within chapters
+        model: "Video", // Reference the Video model
+        select: "title description filename url", // Include specific fields from Video
+      })
+      .lean(); // Convert Mongoose document to plain JavaScript object
+
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    
     const courseDetails = {
       id: course._id,
       title: course.title,
       description: course.description,
-      instructor: course.instructorId.name, 
+      instructor: course.instructorId.name,
+      instructorId: course.instructorId._id,
       createdAt: course.createdAt,
       updatedAt: course.updatedAt,
       chapters: course.chapters.map((chapter) => ({
@@ -167,7 +164,8 @@ const getCourseDetails = async (req, res) => {
           id: video._id,
           title: video.title,
           description: video.description,
-          fileName: video.fileName, 
+          filename: video.filename,
+          url: video.url,
         })),
       })),
     };
@@ -178,6 +176,8 @@ const getCourseDetails = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 module.exports = {
   createCourse,

@@ -1,10 +1,14 @@
 const mongoose = require("mongoose");
-const video = require("../models/Video.model")
 
 const ChapterSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  videos: ["Video"], // Array of videos
+  videos: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Video", // Reference to the Video model
+    },
+  ],
 });
 
 const CourseSchema = new mongoose.Schema({
